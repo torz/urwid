@@ -1,4 +1,0 @@
-urwid
-=====
-
-learning urwid
