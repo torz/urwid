@@ -2,50 +2,48 @@
 import os
 import urwid
 
+currentPath = '/'
+dirList = []
 
-def create_walker_wid(path=None):
-	# get filelist from path
-	try:
-		listFiles = os.listdir(path)
-	except:
-		path = '/'
-		listFiles = os.listdir(path)
-	# create empty list for widget list
-	buttonList = []
-	# create button list
-	for oneFile in listFiles:
-		buttonList.append(urwid.Button(oneFile))
-	# pass  button list to simple walker
-	simpleWalker = urwid.SimpleListWalker(buttonList)
-	# return boxList
-	return urwid.ListBox(simpleWalker)
+def update_curent_path(nextPath):
+    global currentPath
+    if nextPath == '..':
+        currentPath = os.path.dirname(currentPath)
+    else:
+        currentPath = os.path.join(currentPath, nextPath)
+    
+def update_dir_list():
+    global currentPath
+    global dirList
+    try:
+        dirList = os.listdir(currentPath)
+    except:
+        currentPath = '/'
+        dirList = os.listdir(currentPath)
+    if currentPath != '/':
+        dirList.append('..')
 
+def create_buttons():
+    global dirList
+    # create empty list for widget list
+    buttonList = []
+    # create button list
+    for oneFile in dirList:
+        button = urwid.Button(oneFile)
+        urwid.connect_signal(button, 'click', create_main_wid, oneFile)
+        buttonList.append(button)
+    # pass  button list to simple walker
+    return urwid.ListBox(urwid.SimpleListWalker(buttonList))
 
-#choices = u'Chapman Cleese Gilliam Idle Jones Palin'.split()
-choices	= listFiles = os.listdir('/')
+def quit_on_q(self, key):
+    if key == 'q':
+        raise urwid.ExitMainLoop
 
-def menu(title, choices):
-    body = [urwid.Text(title), urwid.Divider()]
-    for c in choices:
-        button = urwid.Button(c)
-        urwid.connect_signal(button, 'click', item_chosen, c)
-        body.append(urwid.AttrMap(button, None, focus_map='reversed'))
-    return urwid.ListBox(urwid.SimpleFocusListWalker(body))
+def main():
+    update_dir_list()
 
-def item_chosen(button, choice):
-    response = urwid.Text([u'You chose ', choice, u'\n'])
-    done = urwid.Button(u'Ok')
-    urwid.connect_signal(done, 'click', exit_program)
-    main.original_widget = urwid.Filler(urwid.Pile([response,
-        urwid.AttrMap(done, None, focus_map='reversed')]))
+    loop = urwid.MainLoop(mainWid, unhandled_input=quit_on_q)
+    loop.run()
 
-def exit_program(button):
-    raise urwid.ExitMainLoop()
-
-main = urwid.Padding(menu(u'Pythons', choices), left=2, right=2)
-top = urwid.Overlay(main, urwid.SolidFill(u'\N{MEDIUM SHADE}'),
-    align='center', width=('relative', 60),
-    valign='middle', height=('relative', 60),
-    min_width=20, min_height=9)
-urwid.MainLoop(top, palette=[('reversed', 'standout', '')]).run()
-
+if __name__ == '__main__':
+    main()

@@ -25,6 +25,6 @@ def quit_on_q(key):
 	if key == 'q':
 		raise urwid.ExitMainLoop
 
-loop = urwid.MainLoop(create_walker_wid(), unhandled_input=quit_on_q)
+loop = urwid.MainLoop(create_walker_wid('/usr/lib'), unhandled_input=quit_on_q)
 loop.run()
 
