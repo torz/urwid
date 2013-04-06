@@ -2,6 +2,17 @@
 import os
 import urwid
 
+myPalette = [
+    (None,  'light gray', 'black'),
+    ('reversed', 'standout', ''),
+    ('heading', 'black', 'light gray'),
+    ('line', 'black', 'light gray'),
+    ('options', 'dark gray', 'black'),
+    ('focus heading', 'white', 'dark red'),
+    ('focus line', 'black', 'dark red'),
+    ('focus options', 'black', 'light gray'),
+    ('selected', 'white', 'dark blue')]
+
 currentPath = '/'
 choices = os.listdir(currentPath)
 
@@ -19,7 +30,7 @@ def update_cp_choices(choice):
 
 def menu(title, choices):
     global currentPath
-    body = [urwid.Text(title), urwid.Divider()]
+    body = [urwid.AttrMap(urwid.Text(title), 'selected'), urwid.Divider()]
     for c in choices:
         button = urwid.Button(c)
         if os.path.isdir(os.path.join(currentPath, c)):
@@ -42,4 +53,4 @@ top = urwid.Overlay(main, urwid.SolidFill(u'\N{MEDIUM SHADE}'),
     align='center', width=('relative', 60),
     valign='middle', height=('relative', 60),
     min_width=20, min_height=9)
-urwid.MainLoop(top, palette=[('reversed', 'standout', '')], unhandled_input=exit_program).run()
+urwid.MainLoop(top, myPalette, unhandled_input=exit_program).run()
